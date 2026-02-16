@@ -18,9 +18,18 @@ body {
   background: radial-gradient(circle at 30% 20%, #202020, #111111 65%);
 }
 
-.red-button {
+.button-stage {
   width: min(62vw, 300px);
   aspect-ratio: 1 / 1;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+}
+
+.red-button {
+  width: 100%;
+  height: 100%;
   border: none;
   appearance: none;
   -webkit-appearance: none;
@@ -95,4 +104,49 @@ body {
 .red-button:focus-visible {
   outline: 3px solid #ff8b8b;
   outline-offset: 8px;
+}
+
+.magic-burst {
+  position: absolute;
+  inset: -32%;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.magic-spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgb(255 244 210 / 1) 0%, rgb(255 150 150 / 0.98) 52%, rgb(255 150 150 / 0) 100%);
+  box-shadow: 0 0 16px rgb(255 126 190 / 0.64);
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(var(--angle)) translateX(0) scale(0.45);
+  animation: magic-spark 720ms ease-out forwards;
+  animation-delay: var(--delay);
+}
+
+@keyframes magic-spark {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateX(0) scale(0.45);
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--angle)) translate(var(--distance-x), calc(var(--distance-y) * -1)) scale(1.18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .magic-spark {
+    animation: none;
+    opacity: 0;
+  }
 }
