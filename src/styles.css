@@ -2,6 +2,13 @@
   color-scheme: dark;
 }
 
+html,
+body {
+  width: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -16,6 +23,7 @@ body {
   display: grid;
   place-items: center;
   background: radial-gradient(circle at 30% 20%, #202020, #111111 65%);
+  overflow: hidden;
 }
 
 .button-stage {
