@@ -10,6 +10,7 @@ function getAudioContext() {
 
 function playDeepStereoMagic(context) {
   const now = context.currentTime;
+  const limiter = context.createDynamicsCompressor();
   const master = context.createGain();
   const delay = context.createDelay();
   const delayGain = context.createGain();
@@ -18,12 +19,18 @@ function playDeepStereoMagic(context) {
   const rightPan = context.createStereoPanner ? context.createStereoPanner() : null;
   const centerPan = context.createStereoPanner ? context.createStereoPanner() : null;
 
+  limiter.threshold.setValueAtTime(-18, now);
+  limiter.knee.setValueAtTime(18, now);
+  limiter.ratio.setValueAtTime(8, now);
+  limiter.attack.setValueAtTime(0.003, now);
+  limiter.release.setValueAtTime(0.2, now);
+
   master.gain.setValueAtTime(0.0001, now);
-  master.gain.exponentialRampToValueAtTime(1.45, now + 0.025);
+  master.gain.exponentialRampToValueAtTime(1.8, now + 0.025);
   master.gain.exponentialRampToValueAtTime(0.0001, now + 2.05);
 
   delay.delayTime.setValueAtTime(0.25, now);
-  delayGain.gain.setValueAtTime(0.34, now);
+  delayGain.gain.setValueAtTime(0.45, now);
   feedback.gain.setValueAtTime(0.38, now);
 
   if (leftPan) {
@@ -38,7 +45,8 @@ function playDeepStereoMagic(context) {
     centerPan.pan.setValueAtTime(0, now);
   }
 
-  master.connect(context.destination);
+  master.connect(limiter);
+  limiter.connect(context.destination);
   master.connect(delay);
   delay.connect(delayGain);
   delay.connect(feedback);
@@ -51,7 +59,7 @@ function playDeepStereoMagic(context) {
   subOscillator.frequency.setValueAtTime(98, now);
   subOscillator.frequency.exponentialRampToValueAtTime(69, now + 1.8);
   subGain.gain.setValueAtTime(0.0001, now);
-  subGain.gain.exponentialRampToValueAtTime(0.34, now + 0.06);
+  subGain.gain.exponentialRampToValueAtTime(0.45, now + 0.06);
   subGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.95);
   subOscillator.connect(subGain);
 
@@ -92,15 +100,15 @@ function playDeepStereoMagic(context) {
     shimmerOscillator.frequency.setValueAtTime(note.frequency * 2, now + note.start + 0.06);
 
     leftGain.gain.setValueAtTime(0.0001, now + note.start);
-    leftGain.gain.exponentialRampToValueAtTime(0.3, now + note.start + 0.04);
+    leftGain.gain.exponentialRampToValueAtTime(0.38, now + note.start + 0.04);
     leftGain.gain.exponentialRampToValueAtTime(0.0001, now + note.end);
 
     rightGain.gain.setValueAtTime(0.0001, now + note.start + 0.03);
-    rightGain.gain.exponentialRampToValueAtTime(0.3, now + note.start + 0.07);
+    rightGain.gain.exponentialRampToValueAtTime(0.38, now + note.start + 0.07);
     rightGain.gain.exponentialRampToValueAtTime(0.0001, now + note.end + 0.03);
 
     shimmerGain.gain.setValueAtTime(0.0001, now + note.start + 0.06);
-    shimmerGain.gain.exponentialRampToValueAtTime(0.12, now + note.start + 0.1);
+    shimmerGain.gain.exponentialRampToValueAtTime(0.16, now + note.start + 0.1);
     shimmerGain.gain.exponentialRampToValueAtTime(0.0001, now + note.end + 0.32);
 
     leftOscillator.connect(leftGain);
