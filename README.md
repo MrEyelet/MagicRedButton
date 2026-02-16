@@ -30,3 +30,11 @@ Po pierwszym pushu upewnij się w ustawieniach repozytorium:
 2. `Build and deployment` -> `Source: GitHub Actions`
 
 Workflow buduje aplikację (`npm run build`) i publikuje katalog `dist`.
+
+## Źródło dźwięku
+
+Użyta próbka: `public/audio/doorbell-dingdong.ogg`.
+
+Źródło: Wikimedia Commons, plik `Doorbell-classic-dingdong.ogg`.
+
+Licencja: Public Domain.
