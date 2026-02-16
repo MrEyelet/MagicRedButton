@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
-const DOORBELL_AUDIO_SRC = "/audio/doorbell-dingdong.ogg";
+let audioContext;
+const DOORBELL_AUDIO_SRC = `${import.meta.env.BASE_URL}audio/doorbell-dingdong.ogg`;
 
 const BURST_PARTICLES = Array.from({ length: 12 }, (_, index) => ({
   angle: index * 30,
@@ -14,6 +15,35 @@ export default function App() {
   const [showBurst, setShowBurst] = useState(false);
   const burstTimeoutRef = useRef(null);
   const audioRef = useRef(null);
+
+  const playFallbackDingDong = () => {
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    const context = audioContext;
+    const now = context.currentTime;
+
+    const playTone = (frequency, start, duration, gainValue) => {
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(frequency, start);
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(gainValue, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+
+      oscillator.start(start);
+      oscillator.stop(start + duration + 0.02);
+    };
+
+    playTone(659.25, now, 0.35, 0.24);
+    playTone(523.25, now + 0.38, 0.65, 0.26);
+  };
 
   useEffect(() => {
     const audio = new Audio(DOORBELL_AUDIO_SRC);
@@ -40,7 +70,10 @@ export default function App() {
       try {
         await audioRef.current.play();
       } catch {
+        playFallbackDingDong();
       }
+    } else {
+      playFallbackDingDong();
     }
 
     if (burstTimeoutRef.current) {
