@@ -26,6 +26,12 @@ body {
   overflow: hidden;
 }
 
+.ui-shell {
+  display: grid;
+  gap: 28px;
+  justify-items: center;
+}
+
 .button-stage {
   width: min(62vw, 300px);
   aspect-ratio: 1 / 1;

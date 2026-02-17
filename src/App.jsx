@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 let audioContext;
 let strikeNoiseBuffer;
-const DOORBELL_AUDIO_SRC = `${import.meta.env.BASE_URL}audio/doorbell-dingdong.ogg`;
+const CLASSIC_AUDIO_SRC = `${import.meta.env.BASE_URL}audio/magicbuttonsound.wav`;
 
 const BURST_PARTICLES = Array.from({ length: 12 }, (_, index) => ({
   angle: index * 30,
@@ -176,32 +176,34 @@ export default function App() {
   const [burstVersion, setBurstVersion] = useState(0);
   const [showBurst, setShowBurst] = useState(false);
   const burstTimeoutRef = useRef(null);
-  const audioRef = useRef(null);
+  const classicAudioRef = useRef(null);
 
   useEffect(() => {
-    const audio = new Audio(DOORBELL_AUDIO_SRC);
-    audio.preload = "auto";
-    audio.volume = 0.72;
-    audioRef.current = audio;
+    const classicAudio = new Audio(CLASSIC_AUDIO_SRC);
+    classicAudio.preload = "auto";
+    classicAudio.volume = 0.72;
+    classicAudioRef.current = classicAudio;
 
     return () => {
       if (burstTimeoutRef.current) {
         clearTimeout(burstTimeoutRef.current);
       }
 
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
+      if (classicAudioRef.current) {
+        classicAudioRef.current.pause();
+        classicAudioRef.current = null;
       }
     };
   }, []);
 
   const handleClick = async () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
+    const activeAudio = classicAudioRef.current;
+
+    if (activeAudio) {
+      activeAudio.currentTime = 0;
 
       try {
-        await audioRef.current.play();
+        await activeAudio.play();
       } catch {
         await playFallbackGeneratedChime();
       }
@@ -226,24 +228,27 @@ export default function App() {
 
   return (
     <main className="page">
-      <div className="button-stage">
-        {showBurst && (
-          <div className="magic-burst" key={burstVersion} aria-hidden="true">
-            {BURST_PARTICLES.map((particle, index) => (
-              <span
-                key={`${burstVersion}-${index}`}
-                className="magic-spark"
-                style={{
-                  "--angle": `${particle.angle}deg`,
-                  "--distance-x": `${particle.distanceX}px`,
-                  "--distance-y": `${particle.distanceY}px`,
-                  "--delay": `${particle.delay}s`
-                }}
-              />
-            ))}
-          </div>
-        )}
-        <button className="red-button" onClick={handleClick} aria-label="Czerwony przycisk" />
+      <div className="ui-shell">
+        <div className="button-stage">
+          {showBurst && (
+            <div className="magic-burst" key={burstVersion} aria-hidden="true">
+              {BURST_PARTICLES.map((particle, index) => (
+                <span
+                  key={`${burstVersion}-${index}`}
+                  className="magic-spark"
+                  style={{
+                    "--angle": `${particle.angle}deg`,
+                    "--distance-x": `${particle.distanceX}px`,
+                    "--distance-y": `${particle.distanceY}px`,
+                    "--delay": `${particle.delay}s`
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
+          <button className="red-button" onClick={handleClick} aria-label="Czerwony przycisk" />
+        </div>
       </div>
     </main>
   );
